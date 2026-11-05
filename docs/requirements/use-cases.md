@@ -1458,7 +1458,7 @@ Details:
 
 **Preconditions:**
 - PRE-1. The course admin or instructor is logged into the system.
-- PRE-2. There exists at least one active student in the system.
+- PRE-2. The student to be viewed is identified; she need not still be active when the request is processed.
 
 **Postconditions:**
 - POST-1. The student's account is deactivated.
@@ -1473,11 +1473,25 @@ Details:
 7. Use case ends.
 
 **Extensions:**
+- 4a. The course admin or instructor cancels or dismisses the warning:
+  - The system closes the warning without requesting deactivation; the account, team membership, and prior work remain unchanged. The use case ends.
+- 6d. Saving deactivation fails:
+  - The system does not report success, reports that deactivation could not be confirmed, and offers retry after refreshing the student's status. An uncommitted change is rolled back.
+- 2a, 6b. The caller is not permitted by BR-student-lifecycle:
+  - The system refuses access without changing the student and ends the use case. Permission is checked again when deactivation is requested.
+- 2b, 6c. The student no longer exists:
+  - The system reports that the student was not found, changes nothing, and ends the use case.
+- 6a. The student is already deactivated, including when another authorized actor deactivated her after step 4:
+  - The system reports that the student is already deactivated, changes nothing, and ends the use case.
 **Priority:** Low
 **Frequency of Use:** Rare. Occurs occasionally when a student withdraws from a course section.
-**Business Rules:** BR-student-lifecycle
+**Business Rules:** BR-student-lifecycle, BR-deactivated-evaluatee, BR-student-deactivation-team, BR-submission-owed
 
 **Associated Information:**
+- Deactivation is a dedicated confirmed action; an ordinary profile edit cannot deactivate the student. A profile save carries the account status originally loaded by its form. If that status has changed before the save, the system rejects the entire save without changing the account or profile and asks the caller to reload. Checking and saving are atomic with deactivation so a stale form cannot unintentionally reactivate the student.
+- FR-SEC-active-account applies to the next protected request even when the student holds an unexpired login token. The warning in step 4 states that existing access ends, no further reports or evaluations may be submitted, reminders stop, teammates cannot submit new evaluations of her, and team membership and prior work remain.
+- Apply BR-deactivated-evaluatee to new peer evaluations and to the course section's weekly peer evaluation report; prior work remains available under the existing visibility rules.
+- For a student on a team, apply BR-student-deactivation-team and BR-submission-owed.
 - Consequence of the deactivation: The student will no longer be able to log in or submit weekly activity reports and peer evaluations, but the student's account and her previously submitted work are kept in the system. Deactivation will NOT remove the student from the system, and the account can be reactivated in the future (UC-STU-reactivate-student: Reactivate a student). This is distinct from deletion (UC-STU-delete-student: Delete a student), which is a physical, unrecoverable delete. The course admin or instructor shall be able to cancel the use case at any time prior to submitting it.
 
 **Related Use Cases:** UC-STU-delete-student: Delete a student; UC-STU-reactivate-student: Reactivate a student
@@ -1516,6 +1530,8 @@ Details:
 **Business Rules:** BR-student-lifecycle
 
 **Associated Information:**
+- An existing profile-edit control may intentionally reactivate a student only when the form was loaded with that account inactive and the stored status still matches its original snapshot. A stale form loaded before deactivation must reload instead of restoring access. This concurrency precondition does not add a new reactivation action or workflow.
+- Deactivation preserves team membership per BR-student-deactivation-team; reactivation does not restore an earlier team assignment if membership has subsequently changed. Apply BR-submission-owed to the current team and account status after reactivation.
 - The course admin or instructor shall be able to cancel the use case at any time prior to submitting it.
 
 **Related Use Cases:** UC-STU-delete-student: Delete a student; UC-STU-deactivate-student: Deactivate a student

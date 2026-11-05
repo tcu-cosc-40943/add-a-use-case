@@ -124,7 +124,7 @@ The planned releases, in order: `v1.6.0` the reminders (the on-demand one, and t
 | UC-STU-find-students | The course admin/instructor finds students | ✅ Built | ✅ Verified | ≤ v1.5.0 | — | — | `Students.vue` → `apis/student` `searchStudents` | `StudentController.findStudentsByCriteria → StudentService.findByCriteria` (+ `StudentSpecs`) / `Student` | `StudentServiceTest.testFindByCriteria`; `StudentIntegrationTest.testFindStudentsByCriteria` |
 | UC-STU-view-student | The course admin/instructor views a student | ✅ Built | ✅ Verified | ≤ v1.5.0 | — | — | `Students.vue` / `EditStudentForm.vue` → `apis/student` `findStudentById` | `StudentController.findStudentById → StudentService.findStudentById` / `Student` | `StudentServiceTest.testFindStudentById`; `StudentIntegrationTest.testInstructorBillFindStudentInfoById`, `testStudentJohnFindOwnInfoById` |
 | UC-STU-delete-student | The course admin deletes a student | ✅ Built | ✅ Verified | ≤ v1.5.0 | — | — | `Students.vue` → `apis/student` `deleteStudent` | `StudentController.deleteStudent → StudentService.deleteStudent` / `Student` | `StudentServiceTest.testDeleteStudent`; `StudentIntegrationTest.testAdminDeletesStudent`, `testStudentDeletesAnotherStudent` |
-| UC-STU-deactivate-student | The course admin/instructor deactivates a student | 🟡 In progress | 🔎 None | Later | — | — | — (no dedicated control; via student edit) → `apis/student` `updateStudent` | `StudentController.updateStudent → StudentService.updateStudent` (`enabled` flag; no dedicated deactivate endpoint) / `Student` | — (no targeted deactivate test; only the generic `updateStudent` path) |
+| UC-STU-deactivate-student | The course admin/instructor deactivates a student | 📐 Designed | — | Later | `FR-SEC-active-account` | [stu.md](design/stu.md) | — | — | — |
 | UC-STU-reactivate-student | The course admin/instructor reactivates a student | 🟡 In progress | 🔎 None | Later | — | — | — (no dedicated control; via student edit) → `apis/student` `updateStudent` | `StudentController.updateStudent → StudentService.updateStudent` (`enabled` flag; no dedicated reactivate endpoint) / `Student` | — (no targeted reactivate test; only the generic `updateStudent` path) |
 | UC-INS-invite-instructors | The course admin invites instructors to register an account | ✅ Built | 🔎 None | ≤ v1.5.0 | — | — | `InviteUsersForm.vue` → `apis/section` `inviteOrAddInstructors` | `SectionController.inviteOrAddInstructors → UserInvitationService.sendEmailInvitations` / `UserInvitation` | — (no test exercises the `invite-or-add` path) |
 | UC-INS-assign-instructors | The course admin assigns instructors to teams | ✅ Built | ✅ Verified | ≤ v1.5.0 | — | — | `Sections.vue` → `apis/team` `assignInstructorToTeam` | `TeamController.assignInstructorToTeam → TeamService.assignInstructorToTeam` (+ `InstructorRepository`) / `Team` | `TeamServiceTest.testAssignInstructorToTeam`; `TeamIntegrationTest.assignInstructorToTeam`, `assignInstructorToTeamNotSameSection` |
@@ -343,6 +343,7 @@ A business rule (`BR-*`, owned by [business-rules.md](requirements/business-rule
 | `BR-authored-prevails` | `UC-AI-elicit-requirements` | — | — |
 | `BR-collab-no-overwrite` | `UC-COL-collaborative-edit` | `ROB-no-overwrite` | — |
 | `BR-comment-access` | `UC-COL-add-comment`, `UC-COL-resolve-comment` | — | — |
+| `BR-deactivated-evaluatee` | `UC-STU-deactivate-student` | — | — |
 | `BR-deletion-integrity` | `UC-ART-delete-artifact`, `UC-GLO-delete-term` | `DI-artifact-key-assignment`, `DI-referential-integrity`, `DI-soft-delete-retention`, (prose) | — |
 | `BR-document-creation` | `UC-TPL-provision-documents` | — | — |
 | `BR-edit-lock-required` | `UC-COL-collaborative-edit`, `UC-DOC-edit-document`, `UC-DOC-edit-use-case` | `DI-concurrency-control`, (prose) | — |
@@ -364,7 +365,8 @@ A business rule (`BR-*`, owned by [business-rules.md](requirements/business-rule
 | `BR-section-config-access` | `UC-CFG-configure-assistant-instructions`, `UC-CFG-configure-review-criteria`, `UC-CFG-configure-teaching-context`, `UC-CFG-toggle-assistants` | — | — |
 | `BR-section-scoped-access` | `UC-EVA-section-evaluation-report`, `UC-EVA-student-evaluation-report`, `UC-NOT-remind-non-submitters`, `UC-WAR-student-war-report`, `UC-WAR-team-war-report` | `FR-SEC-authorization`, `SEC-authorization` | `QS-cross-team-denial` |
 | `BR-source-material-import` | `UC-AI-import-source-material` | — | — |
-| `BR-submission-owed` | `UC-EVA-section-evaluation-report`, `UC-NOT-remind-non-submitters`, `UC-WAR-team-war-report` | `FR-NOT-weekly-reminder` | — |
+| `BR-student-deactivation-team` | `UC-STU-deactivate-student` | — | — |
+| `BR-submission-owed` | `UC-EVA-section-evaluation-report`, `UC-NOT-remind-non-submitters`, `UC-STU-deactivate-student`, `UC-WAR-team-war-report` | `FR-NOT-weekly-reminder` | — |
 | `BR-student-lifecycle` | `UC-STU-deactivate-student`, `UC-STU-delete-student`, `UC-STU-reactivate-student` | `FR-SEC-active-account` | — |
 | `BR-team-admin-only` | `UC-INS-assign-instructors`, `UC-INS-remove-instructor`, `UC-TEA-assign-students`, `UC-TEA-create-team`, `UC-TEA-delete-team`, `UC-TEA-edit-team`, `UC-TEA-remove-student` | — | — |
 | `BR-team-assignment-required` | `UC-EVA-submit-evaluation`, `UC-NOT-remind-non-submitters`, `UC-WAR-manage-activities` | — | — |
